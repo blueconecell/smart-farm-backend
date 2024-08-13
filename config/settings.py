@@ -35,6 +35,7 @@ THIRD_PARTY_APPS=[
 ]
 CUSTOM_APPS=[
     "smallFarm.apps.SmallfarmConfig",
+    "teams.apps.TeamsConfig"
     ]
 SYSTEM_APPS =[
     "django.contrib.admin",
@@ -108,7 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 

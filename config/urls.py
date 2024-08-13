@@ -22,4 +22,5 @@ from django.conf import settings
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/smallFarm/",include("smallFarm.urls")),
+    path("api/v1/teams/",include("teams.urls")),
 ]
