@@ -24,3 +24,20 @@ class MoistureSensor(models.Model):
 
     def __str__(self):
         return f"{self.soil_sample.name} => 측정값 : {self.humidValue} "
+    
+
+class GasAreaSample(models.Model):
+    team = models.ForeignKey(Team, related_name='gasArea_samples', on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    location = models.CharField(max_length=100, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f"{self.name} => {self.team.name}"
+    
+class GasSensor(models.Model):
+    gasArea_sample = models.ForeignKey(GasAreaSample, related_name='gas_sensors', on_delete=models.CASCADE)
+    gasValue = models.FloatField(null=True, blank=True)
+    measured_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.gasArea_sample.name} => 측정값 : {self.gasValue} "

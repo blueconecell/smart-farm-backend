@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 
-from .models import SmallFarm,SoilSample,MoistureSensor
+from .models import SmallFarm,SoilSample,MoistureSensor,GasAreaSample,GasSensor
 from . import serializers
 # Create your views here.
 class AllSmallFarm(APIView):
@@ -25,7 +25,8 @@ class AllSmallFarm(APIView):
                 return Response({"test error(valid_error)":str(e)})
         except Exception as e:
             return Response({"test error(data error)":str(e)})
-        
+    
+# 토양수분도 학습 모듈
 class AllSoilSampleView(APIView):
     def get(self, request):
         try:
@@ -79,6 +80,71 @@ class AllMoistureSensorView(APIView):
     def post(self, request):
         try:
             serializer = serializers.MoistureSensorSerializer(data = request.data)
+            try:
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data)
+            except Exception as e:
+                return Response({"test error(valid_error)":str(e)})
+        except Exception as e:
+            return Response({"test error(data error)":str(e)})
+
+# DIY 온실가스 측정기
+class AllGasAreaSampleView(APIView):
+    def get(self, request):
+        try:
+            gasAreaSamples = GasAreaSample.objects.all()
+            serializer = serializers.GasAreaSampleSerializer(gasAreaSamples,many=True,)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({"에러":str(e)})
+    def post(self, request):
+        try:
+            serializer = serializers.GasAreaSampleSerializer(data = request.data)
+            if serializer.is_valid():
+                try:
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                except Exception as e:
+                    return Response({"test error(valid_error)": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"test error(data error)": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+class GasAreaSampleDetailsView(APIView):
+    def get_object(self, gasAreaSamplePK):
+        try:
+            return GasAreaSample.objects.get(id=gasAreaSamplePK)
+        except GasAreaSample.DoesNotExist:
+            raise NotFound(detail="GasAreaSample not found.")
+
+    def get(self, request, gasAreaSamplePK):
+        try:
+            GasAreaSample = self.get_object(gasAreaSamplePK)
+            gasSensors = GasSensor.objects.filter(gasArea_sample=GasAreaSample)
+            if not gasSensors.exists():
+                return Response({"detail": "No gasSensors found for this GasAreaSample."}, status=status.HTTP_204_NO_CONTENT)
+            
+            serializer = serializers.GasSensorSerializer(gasSensors, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        except GasSensor.DoesNotExist:
+            return Response({"detail": "Error retrieving gasSensors data."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        except Exception as e:
+            return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class AllGasSensorView(APIView):
+    def get(self, request):
+        try:
+            gasSensors = GasSensor.objects.all()
+            serializer = serializers.GasSensorSerializer(gasSensors,many=True,)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({"에러":str(e)})
+    def post(self, request):
+        try:
+            serializer = serializers.GasSensorSerializer(data = request.data)
             try:
                 if serializer.is_valid():
                     serializer.save()
