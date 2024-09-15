@@ -153,3 +153,23 @@ class AllGasSensorView(APIView):
                 return Response({"test error(valid_error)":str(e)})
         except Exception as e:
             return Response({"test error(data error)":str(e)})
+        
+class LatestGasValue(APIView):
+    def get(self,request):
+        try:
+            all_gas_sensors = GasSensor.objects.all().order_by('-measured_at')
+            latest_gas_values = {}
+            # 최신 값만 유지하는 루프
+            for sensor in all_gas_sensors:
+                # 해당 gasArea_sample에 대한 값이 없으면 추가
+                if sensor.gasArea_sample_id not in latest_gas_values:
+                    latest_gas_values[sensor.gasArea_sample_id] = {
+                        'gasArea_sample_pk': sensor.gasArea_sample.pk,
+                        'gasArea_sample_name': sensor.gasArea_sample.name,
+                        'gasValue': sensor.gasValue,
+                        'measured_at': sensor.measured_at,
+                    }
+            data = list(latest_gas_values.values())
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"LatestGasValue error":str(e)})

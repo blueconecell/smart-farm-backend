@@ -40,4 +40,4 @@ class GasSensor(models.Model):
     measured_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.gasArea_sample.name} => 측정값 : {self.gasValue} "
+        return f"{self.gasArea_sample.name} => 측정값 : {self.gasValue}"

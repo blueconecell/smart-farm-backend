@@ -9,4 +9,5 @@ urlpatterns = [
     path("GasAreaSample", views.AllGasAreaSampleView.as_view()),
     path("GasAreaSample/<str:gasAreaSamplePK>", views.GasAreaSampleDetailsView.as_view()),
     path("GasSensor", views.AllGasSensorView.as_view()),
+    path("LatestGasValue",views.LatestGasValue.as_view()),
 ]
